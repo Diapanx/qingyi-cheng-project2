@@ -12,7 +12,7 @@ import {
 import HomePage from './HomePage.jsx';
 import Rules from './Rules.jsx';
 import Header from './Header.jsx';
-import MinesweeperGame from './MineSweeperGame.jsx';
+import MinesweeperGame from './MinesweeperGame.jsx';
 import { MinesweeperGameProvider } from './MinesweeperGameProvider.jsx';
 
 const router = createBrowserRouter([
