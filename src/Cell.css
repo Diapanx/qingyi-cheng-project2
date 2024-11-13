@@ -1,0 +1,26 @@
+.cell {
+    height: 33px;
+    width: 33px;
+    margin: 0.1rem;
+    border: solid 1px black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+}
+
+.unselected {
+    background-color: lightgrey;
+}
+
+.unselected:hover {
+    cursor: pointer;
+}
+
+.selected {
+    background-color: white;
+}
+
+.selected:hover {
+    cursor: default;
+}

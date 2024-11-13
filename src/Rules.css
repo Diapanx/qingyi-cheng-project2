@@ -1,0 +1,18 @@
+.rules {
+    margin-top: 10vh;
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+    height: 70vh;
+    text-align: center;
+}
+
+.rule-body {
+    text-align: justify;
+    margin: 5rem;
+    font-size: larger;
+}
+
+p {
+    margin: 20px;
+}
