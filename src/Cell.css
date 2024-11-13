@@ -39,13 +39,15 @@
         height: 10px;
         width: 10px;
         margin: 0.05rem;
+        border: solid 0.5px black;
     }
 }
 
 @media screen and (max-width: 400px) {
     .cell {
-        height: 8px;
-        width: 8px;
+        height: 9px;
+        width: 9px;
         margin: 0.05rem;
+        border: solid 0.5px black;
     }
 }
