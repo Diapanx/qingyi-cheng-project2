@@ -5,11 +5,16 @@ import { MinesweeperContext } from './MinesweeperGameProvider';
 export default function Cell(props) {
     const globalProps = useContext(MinesweeperContext);
     const {
-        checkIfGameIsOver,
         gameOverState,
+        setGameOverState,
         setRevealedCells,
         revealAdjacentCells,
         revealedCells,
+        flaggedCells,
+        setFlaggedCells,
+        setNumFlagged,
+        setRemainingMines,
+        incrementNumFoundCell
     } = globalProps;
 
     const row = props.row;
@@ -17,6 +22,8 @@ export default function Cell(props) {
     const isMine = props.isMine;
     const key = `${row}-${col}`;
     const isRevealed = revealedCells[key];
+    const isFlagged = flaggedCells[key]
+
 
     const className = isRevealed ? 'cell selected' : 'cell unselected';
     let cellContent = '';
@@ -27,24 +34,46 @@ export default function Cell(props) {
         } else if (isMine !== 0) {
             cellContent = isMine;
         }
+    } else if (isFlagged) {
+        cellContent = '🚩';
     }
-
+    
     function onMousePress(x, y) {
         if (isRevealed || gameOverState) return;
 
-        setRevealedCells(prev => ({ ...prev, [key]: true }));
-
         if (isMine === 0) {
             revealAdjacentCells(x, y);
+        } else if (isMine > 0) {
+            setRevealedCells(prev => ({ ...prev, [key]: true }));
+            incrementNumFoundCell(); // Increment for non-zero, non-mine cells
+        } else if (isMine === -1) {
+            setRevealedCells(prev => ({ ...prev, [key]: true }));
+            setGameOverState(-1); // Game lost
+        }
+    }
+
+    function onRightClick(e) {
+        e.preventDefault();
+        if (isRevealed || gameOverState) return;
+
+        setFlaggedCells((prev) => ({ ...prev, [key]: !prev[key] }));
+        if (!flaggedCells[key]) {
+            // If the cell was not flagged before, now it's being flagged
+            setNumFlagged((prev) => prev + 1);
+            setRemainingMines((prev) => prev - 1);
+        } else {
+            // If the cell was flagged before, now it's being unflagged
+            setNumFlagged((prev) => prev - 1);
+            setRemainingMines((prev) => prev + 1);
         }
 
-        checkIfGameIsOver(row, col);
     }
 
     return (
         <div
             className={className}
             onClick={() => !gameOverState && onMousePress(row, col)}
+            onContextMenu={onRightClick}
         >
             {cellContent}
         </div>

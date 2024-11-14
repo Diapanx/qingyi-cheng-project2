@@ -12,6 +12,7 @@ export default function MinesweeperGame(){
     const col = globalProps.cols
     const endingComponent = globalProps.endingComponent
     const setEndingComponent = globalProps.setEndingComponent
+    const remainingMines = globalProps.remainingMines
 
     let rowComponents = [];
 
@@ -21,7 +22,7 @@ export default function MinesweeperGame(){
         } else if (gameOverState === -1) {
             setEndingComponent(<h1 className='ending'>Game over! You lost!</h1>);
         }
-    }, [gameOverState, setEndingComponent]);
+    }, [gameOverState]);
 
     for (let i = 0; i < row; i++){
         const singleRowComponent = [];
@@ -37,17 +38,13 @@ export default function MinesweeperGame(){
 
     const setResetState = globalProps.setResetState
 
-    const handleReset = () => {
-        setResetState((prevState) => !prevState)
-    }
-
-
     return (
         <div className='game-body'>
             <div>{endingComponent}</div>
             <div>
-                <div className='btn-container'>
-                    <button onClick={()=>handleReset()}>Reset</button>
+                <div className='game-header'>
+                    <div>💣: {remainingMines}</div>
+                    <button onClick={()=>setResetState((prevState) => !prevState)}>Reset</button>
                 </div>
                 {rowComponents}
             </div>

@@ -10,9 +10,10 @@
     height: 100vh;
 }
 
-.btn-container {
+.game-header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     margin: 1rem;
+
 }

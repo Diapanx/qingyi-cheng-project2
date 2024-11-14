@@ -12,15 +12,22 @@ export function MinesweeperGameProvider(props){
     const [resetState, setResetState] = useState(false)
     const [endingComponent, setEndingComponent] = useState(undefined)
     const [revealedCells, setRevealedCells] = useState({});
+    const [flaggedCells, setFlaggedCells] = useState({});
+    const [numFlagged, setNumFlagged] = useState(0)
+    const [remainingMines, setRemainingMines] = useState(0)
+    const [numFoundCell, setNumFoundCell] = useState(0);
 
 
     function revealAdjacentCells(x, y, visited = {}) {
         const key = `${x}-${y}`;
-        if (visited[key]) return;
+    
+        // Check if the cell has already been revealed or visited in this recursion
+        if (visited[key] || revealedCells[key]) return;
     
         visited[key] = true;
     
         setRevealedCells(prev => ({ ...prev, [key]: true }));
+        incrementNumFoundCell();
     
         const directions = [
             [-1, -1], [-1, 0], [-1, 1],
@@ -38,21 +45,22 @@ export function MinesweeperGameProvider(props){
                 newRow < rows &&
                 newCol >= 0 &&
                 newCol < cols &&
-                !visited[newKey]
+                !visited[newKey] &&
+                !revealedCells[newKey]
             ) {
                 const adjacentMineCount = boardState[newKey];
     
                 if (adjacentMineCount === 0) {
                     revealAdjacentCells(newRow, newCol, visited);
-                } else {
-                    setRevealedCells(prev => ({ ...prev, [newKey]: true }));
+                } else if (adjacentMineCount > 0) {
                     visited[newKey] = true;
+                    setRevealedCells(prev => ({ ...prev, [newKey]: true }));
+                    incrementNumFoundCell();
                 }
             }
         });
     }
     // Switch game difficulty
-    let numFoundCell = 0;
     let numMine = 0;
     let rows = undefined;
     let cols = undefined;
@@ -71,18 +79,19 @@ export function MinesweeperGameProvider(props){
         cols = 30
         numMine = 99
     }
+    useEffect(() => {
+        setRemainingMines(numMine);
+    }, [numMine]);
 
-    function checkIfGameIsOver(row, column) {
-        const foundMine = boardState[row + '-' + column]
-        if(foundMine == -1) {
-            setGameOverState(-1);
-        }
-        else{
-            numFoundCell++;
-            if (numFoundCell == rows * cols - numMine){
-                setGameOverState(1)
+    function incrementNumFoundCell() {
+        setNumFoundCell((prevNumFoundCell) => {
+            const newNumFoundCell = prevNumFoundCell + 1;
+            if (newNumFoundCell === rows * cols - numMine) {
+                setGameOverState(1); // Game won
             }
-        }
+            return newNumFoundCell;
+        });
+        console.log(numFoundCell)
     }
 
     useEffect(()=>{
@@ -92,6 +101,7 @@ export function MinesweeperGameProvider(props){
     useEffect(()=>{
         const board = {};
         const revealed = {}
+        const flagged = {}
         let minePlaced = 0;
         const directions = [
             [-1, -1],
@@ -108,6 +118,7 @@ export function MinesweeperGameProvider(props){
             for(let j = 0; j < cols; j ++) {
                 board[i + '-' + j] = 0;
                 revealed[i + '-' + j] = false
+                flagged[i + '-' + j] = false
             }
         }
 
@@ -135,14 +146,17 @@ export function MinesweeperGameProvider(props){
 
         setBoardState(board)
         setRevealedCells(revealed)
+        setFlaggedCells(flagged)
+        setRemainingMines(numMine)
         setEndingComponent(undefined)
         setGameOverState(0)
+        setNumFoundCell(0)
     }, [resetState])
 
     const globalProps = {
         boardState: boardState,
-        checkIfGameIsOver: checkIfGameIsOver,
         gameOverState: gameOverState,
+        setGameOverState: setGameOverState,
         resetState: resetState,
         setResetState: setResetState,
         rows: rows,
@@ -152,7 +166,14 @@ export function MinesweeperGameProvider(props){
         setEndingComponent: setEndingComponent,
         revealedCells: revealedCells,
         setRevealedCells: setRevealedCells,
-        revealAdjacentCells: revealAdjacentCells
+        revealAdjacentCells: revealAdjacentCells,
+        flaggedCells: flaggedCells,
+        setFlaggedCells: setFlaggedCells,
+        numFlagged: numFlagged,
+        setNumFlagged: setNumFlagged,
+        remainingMines,
+        setRemainingMines,
+        incrementNumFoundCell
     }
 
     return <MinesweeperContext.Provider value={globalProps}>
