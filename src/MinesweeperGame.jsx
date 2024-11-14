@@ -18,9 +18,9 @@ export default function MinesweeperGame(){
 
     useEffect(() => {
         if (gameOverState === 1) {
-            setEndingComponent(<h1>Game over! You Won!</h1>);
+            setEndingComponent(<h1 className='ending'>Game over! You Won!</h1>);
         } else if (gameOverState === -1) {
-            setEndingComponent(<h1>Game over! You lost!</h1>);
+            setEndingComponent(<h1 className='ending'>Game over! You lost!</h1>);
         }
     }, [gameOverState, setEndingComponent]);
 
