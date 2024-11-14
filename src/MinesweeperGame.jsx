@@ -2,7 +2,6 @@ import './MinesweeperGame.css'
 import Cell from './Cell'
 import { useContext, useEffect } from 'react';
 import { MinesweeperContext } from './MinesweeperGameProvider';
-import { useParams } from 'react-router-dom';
 
 export default function MinesweeperGame(){
 

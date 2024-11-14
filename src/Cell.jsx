@@ -7,7 +7,6 @@ export default function Cell(props) {
     const {
         checkIfGameIsOver,
         gameOverState,
-        boardState,
         setRevealedCells,
         revealAdjacentCells,
         revealedCells,
@@ -19,7 +18,6 @@ export default function Cell(props) {
     const key = `${row}-${col}`;
     const isRevealed = revealedCells[key];
 
-    // Compute className and cellContent based on isRevealed and isMine
     const className = isRevealed ? 'cell selected' : 'cell unselected';
     let cellContent = '';
 
@@ -36,9 +34,7 @@ export default function Cell(props) {
 
         setRevealedCells(prev => ({ ...prev, [key]: true }));
 
-        if (isMine === -1) {
-            // Handle game over
-        } else if (isMine === 0) {
+        if (isMine === 0) {
             revealAdjacentCells(x, y);
         }
 
