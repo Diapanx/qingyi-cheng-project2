@@ -1,45 +1,56 @@
-import { useContext, useState, useEffect } from 'react'
-import './Cell.css'
-import { MinesweeperContext } from './MinesweeperGameProvider'
+import { useContext } from 'react';
+import './Cell.css';
+import { MinesweeperContext } from './MinesweeperGameProvider';
 
-
-export default function Cell(props){
-
+export default function Cell(props) {
     const globalProps = useContext(MinesweeperContext);
-    const checkIfGameIsOver = globalProps.checkIfGameIsOver;
-    const resetState = globalProps.resetState;
-    const numFoundCell = globalProps.numFoundCell;
-    const gameOverState = globalProps.gameOverState;
-    useEffect(() => {
-        setClassName('cell unselected'),
-        setCellContent('')
-      }, [resetState]);
+    const {
+        checkIfGameIsOver,
+        gameOverState,
+        boardState,
+        setRevealedCells,
+        revealAdjacentCells,
+        revealedCells,
+    } = globalProps;
 
-    const row = props.row
-    const col = props.col
-    const isMine = props.isMine
+    const row = props.row;
+    const col = props.col;
+    const isMine = props.isMine;
+    const key = `${row}-${col}`;
+    const isRevealed = revealedCells[key];
 
-    const [cellContent, setCellContent] = useState('')
-    const [className, setClassName] = useState('cell unselected')
+    // Compute className and cellContent based on isRevealed and isMine
+    const className = isRevealed ? 'cell selected' : 'cell unselected';
+    let cellContent = '';
 
-    function onMousePress(x, y){
-        if (isMine == -1){
-            setCellContent('💣')
+    if (isRevealed) {
+        if (isMine === -1) {
+            cellContent = '💣';
+        } else if (isMine !== 0) {
+            cellContent = isMine;
         }
-        else if (isMine !== 0){
-            setCellContent(isMine)
-        }
-        else {
-            setCellContent('')
-        }
-        setClassName('cell selected')
+    }
 
-        checkIfGameIsOver(row, col)
+    function onMousePress(x, y) {
+        if (isRevealed || gameOverState) return;
+
+        setRevealedCells(prev => ({ ...prev, [key]: true }));
+
+        if (isMine === -1) {
+            // Handle game over
+        } else if (isMine === 0) {
+            revealAdjacentCells(x, y);
+        }
+
+        checkIfGameIsOver(row, col);
     }
 
     return (
-        <div className={className} onClick={() => !gameOverState && onMousePress()}>
+        <div
+            className={className}
+            onClick={() => !gameOverState && onMousePress(row, col)}
+        >
             {cellContent}
         </div>
-    )
+    );
 }
