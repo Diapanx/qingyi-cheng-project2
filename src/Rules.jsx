@@ -1,4 +1,4 @@
-import './Rules.css'
+import './style/Rules.css'
 
 
 export default function Rules(){
