@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import './Cell.css';
+import './style/Cell.css';
 import { MinesweeperContext } from './MinesweeperGameProvider';
 
 export default function Cell(props) {
@@ -14,7 +14,8 @@ export default function Cell(props) {
         setFlaggedCells,
         setNumFlagged,
         setRemainingMines,
-        incrementNumFoundCell
+        incrementNumFoundCell,
+        revealAdjacentEight
     } = globalProps;
 
     const row = props.row;
@@ -39,7 +40,11 @@ export default function Cell(props) {
     }
     
     function onMousePress(x, y) {
-        if (isRevealed || gameOverState) return;
+        if (gameOverState) return;
+        if (isRevealed){
+            revealAdjacentEight(x, y)
+            return
+        }
 
         if (isMine === 0) {
             revealAdjacentCells(x, y);

@@ -60,6 +60,52 @@ export function MinesweeperGameProvider(props){
             }
         });
     }
+
+    function revealAdjacentEight(x, y) {    
+        const directions = [
+            [-1, -1], [-1, 0], [-1, 1],
+            [0, -1],          [0, 1],
+            [1, -1], [1, 0], [1, 1],
+        ];
+    
+        directions.forEach(([dx, dy]) => {
+            const newRow = x + dx;
+            const newCol = y + dy;
+            const newKey = `${newRow}-${newCol}`;
+    
+            if (
+                newRow >= 0 &&
+                newRow < rows &&
+                newCol >= 0 &&
+                newCol < cols &&
+                !revealedCells[newKey] &&
+                !flaggedCells[newKey]
+            ) {
+                const adjacentMineCount = boardState[newKey];
+    
+                if (adjacentMineCount === 0) {
+                    revealAdjacentCells(newRow, newCol, visited);
+                } else if (adjacentMineCount > 0) {
+                    setRevealedCells(prev => ({ ...prev, [newKey]: true }));
+                    incrementNumFoundCell();
+                } else if (adjacentMineCount === -1) {
+                    setRevealedCells(prev => ({ ...prev, [newKey]: true }));
+                    setGameOverState(-1); // Game lost
+                }
+            }
+        });
+    }
+
+    function incrementNumFoundCell() {
+        setNumFoundCell((prevNumFoundCell) => {
+            const newNumFoundCell = prevNumFoundCell + 1;
+            if (newNumFoundCell === rows * cols - numMine) {
+                setGameOverState(1); // Game won
+            }
+            return newNumFoundCell;
+        });
+    }
+
     // Switch game difficulty
     let numMine = 0;
     let rows = undefined;
@@ -83,20 +129,25 @@ export function MinesweeperGameProvider(props){
         setRemainingMines(numMine);
     }, [numMine]);
 
-    function incrementNumFoundCell() {
-        setNumFoundCell((prevNumFoundCell) => {
-            const newNumFoundCell = prevNumFoundCell + 1;
-            if (newNumFoundCell === rows * cols - numMine) {
-                setGameOverState(1); // Game won
-            }
-            return newNumFoundCell;
-        });
-        console.log(numFoundCell)
-    }
-
     useEffect(()=>{
         setResetState((prevState) => !prevState)
     }, [difficulty])
+
+    function revealAllBombs() {
+        const newRevealedCells = { ...revealedCells }; // Start with the existing revealed cells state
+        Object.keys(boardState).forEach(key => {
+            if (boardState[key] === -1) { // Check if the cell is a mine
+                newRevealedCells[key] = true; // Reveal the mine cell
+            }
+        });
+        setRevealedCells(newRevealedCells);
+    }
+    
+    useEffect(() => {
+        if (gameOverState === -1) {
+            revealAllBombs();
+        }
+    }, [gameOverState]);
 
     useEffect(()=>{
         const board = {};
@@ -173,7 +224,8 @@ export function MinesweeperGameProvider(props){
         setNumFlagged: setNumFlagged,
         remainingMines,
         setRemainingMines,
-        incrementNumFoundCell
+        incrementNumFoundCell,
+        revealAdjacentEight
     }
 
     return <MinesweeperContext.Provider value={globalProps}>
