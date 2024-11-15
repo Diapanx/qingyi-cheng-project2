@@ -84,7 +84,7 @@ export function MinesweeperGameProvider(props){
                 const adjacentMineCount = boardState[newKey];
     
                 if (adjacentMineCount === 0) {
-                    revealAdjacentCells(newRow, newCol, visited);
+                    revealAdjacentCells(newRow, newCol);
                 } else if (adjacentMineCount > 0) {
                     setRevealedCells(prev => ({ ...prev, [newKey]: true }));
                     incrementNumFoundCell();
